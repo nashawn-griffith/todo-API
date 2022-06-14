@@ -1,0 +1,22 @@
+version: '3.0'
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: Dev
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+    volumes:
+      - '/app/node_modules'
+      - './:/app'
+  mongo:
+    image: mongo:5.0
+    ports:
+      - '27017'
+    volumes:
+      - 'todo_api_volume:/data/db'
+volumes:
+  todo_api_volume:
