@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const todoRoutes = require('./routes/todoRoutes');
-const {shutdown} = require('./shutdown');
+const {shutdown} = require('./helper');
 
 let server;
 const PORT = process.env.PORT || 5000;
