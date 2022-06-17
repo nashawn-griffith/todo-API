@@ -6,7 +6,6 @@ const {shutdown} = require('./helper');
 
 let server;
 const PORT = process.env.PORT || 5000;
-console.log('Test commit');
 
 app.use('/api/todo', todoRoutes);
 
