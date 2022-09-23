@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const mongoose = require('mongoose');
 const todoRoutes = require('./routes/todoRoutes');
 const {shutdown} = require('./helper');
@@ -7,7 +8,14 @@ const {shutdown} = require('./helper');
 let server;
 const PORT = process.env.PORT || 5000;
 
-app.use('/api/todo', todoRoutes);
+// app.use((req, res, next) => {
+// 	console.log('Testing log');
+// 	next();
+// });
+
+//app.use(cors());
+app.use(express.json());
+app.use('/todo', todoRoutes);
 
 mongoose
 	.connect(`mongodb://mongo`)

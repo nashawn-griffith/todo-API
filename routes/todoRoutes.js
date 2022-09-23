@@ -1,6 +1,7 @@
 const todoRouter = require('express').Router();
 const Todo = require('../models/todoModel');
 
+//Get all Todo Items
 todoRouter.get('/lists', async (req, res) => {
 	try {
 		const todoItems = await Todo.find().select('title status');
@@ -8,13 +9,15 @@ todoRouter.get('/lists', async (req, res) => {
 		if (todoItems.length === 0) {
 			return res.status(204).json({body: 'No Todo Items Found'});
 		}
-		return res.json(todoItems);
+		console.log('Sending items to front end');
+		return res.json({body: todoItems});
 	} catch (err) {
 		console.error(err);
 		return res.send('Something went wrong');
 	}
 });
 
+//Get a single Todo Item
 todoRouter.get('/list/:id', async (req, res) => {
 	try {
 		if (!req.params.id) return res.status(400).json({body: 'Bad Request !! Please specify an ID'});
@@ -28,11 +31,14 @@ todoRouter.get('/list/:id', async (req, res) => {
 	}
 });
 
+//Add a Todo Item
 todoRouter.post('/add', async (req, res) => {
 	let body = {
-		title: 'third item',
+		title: req.body.data,
 		status: true,
 	};
+
+	console.log('item added successfully');
 
 	try {
 		const newTodo = await Todo.create(body);
@@ -42,5 +48,7 @@ todoRouter.post('/add', async (req, res) => {
 		return res.send('Something went wrong');
 	}
 });
+
+//Delete a Todo Item
 
 module.exports = todoRouter;
