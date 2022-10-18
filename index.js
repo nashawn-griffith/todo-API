@@ -1,3 +1,4 @@
+'use strict';
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -7,6 +8,7 @@ const {shutdown} = require('./helper');
 
 let server;
 const PORT = process.env.PORT || 5000;
+const DB_CONNECTION_STRING = `mongodb://localhost:27017`;
 
 // app.use((req, res, next) => {
 // 	console.log('Testing log');
@@ -18,7 +20,7 @@ app.use(express.json());
 app.use('/todo', todoRoutes);
 
 mongoose
-	.connect(`mongodb://mongo`)
+	.connect(DB_CONNECTION_STRING)
 	.then(() => {
 		console.log('connected to db successfully');
 		server = app.listen(PORT, () => console.log(`Server listening on port ${PORT} in ${process.env.NODE_ENV} mode`));

@@ -1,30 +1,47 @@
+'use strict';
 const todoRouter = require('express').Router();
 const Todo = require('../models/todoModel');
+const {responses} = require('../helper');
 
 //Get all Todo Items
 todoRouter.get('/lists', async (req, res) => {
+	//
+	const LIMIT = 10;
+	let skipCount = 0; //page-1 * limit
+
+	if (req.query?.page) skipCount = (Number(req.query.page) - 1) * LIMIT;
+
 	try {
-		const todoItems = await Todo.find().select('title status');
+		const todoItems = await Todo.find().select('title status _id').skip(skipCount).limit(LIMIT);
 
 		if (todoItems.length === 0) {
-			return res.status(204).json({body: 'No Todo Items Found'});
+			const {statusCode, message} = responses.NO_CONTENT;
+			return res.status(statusCode).json({body: message});
 		}
-		console.log('Sending items to front end');
-		return res.json({body: todoItems});
+
+		const {statusCode} = responses.SUCCESS;
+		return res.status(statusCode).json({body: todoItems});
 	} catch (err) {
+		const {statusCode, message} = responses.SERVER_ERROR;
 		console.error(err);
-		return res.send('Something went wrong');
+		return res.status(statusCode).json({body: message});
 	}
 });
 
 //Get a single Todo Item
 todoRouter.get('/list/:id', async (req, res) => {
 	try {
-		if (!req.params.id) return res.status(400).json({body: 'Bad Request !! Please specify an ID'});
 		const {id} = req.params;
 
 		const existingTodo = await Todo.findById(id).select('title status');
-		return res.status(200).json({body: existingTodo});
+
+		if (!existingTodo) {
+			const {statusCode, message} = responses.NOT_FOUND;
+			return res.status(statusCode).json({body: message});
+		}
+
+		const {statusCode} = responses.SUCCESS;
+		return res.status(statusCode).json({body: existingTodo});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({body: 'Something Went Wrong'});
@@ -49,6 +66,24 @@ todoRouter.post('/add', async (req, res) => {
 	}
 });
 
+//Update an item - TODO
+
 //Delete a Todo Item
+todoRouter.delete('/delete/:id', async (req, res) => {
+	try {
+		const {id} = req.params;
+
+		const result = await Todo.findByIdAndDelete(id).select('_id title status');
+		console.log(result);
+
+		const {statusCode} = responses.SUCCESS;
+
+		return res.status(statusCode).json({body: result});
+	} catch (err) {
+		const {statusCode, message} = responses.SERVER_ERROR;
+		console.error(err);
+		return res.status(statusCode).json({body: message});
+	}
+});
 
 module.exports = todoRouter;
